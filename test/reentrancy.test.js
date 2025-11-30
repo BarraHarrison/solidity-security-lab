@@ -88,7 +88,8 @@ describe("Reentrancy Vulnerability Lab", function () {
 
         await expect(
             attackerAgainstFixed.connect(attackerEOA).attack({ value: attackDeposit })
-        ).to.not.be.reverted;
+        ).to.be.revertedWith("ReentrancyGuard: reentrant call");
+
 
         const bankBalanceAfter = await ethers.provider.getBalance(bankAddress);
         const attackerContractBalance = await ethers.provider.getBalance(
