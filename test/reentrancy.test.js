@@ -96,7 +96,8 @@ describe("Reentrancy Vulnerability Lab", function () {
             attackerContractAddress
         );
 
-        expect(bankBalanceAfter).to.be.greaterThan(0n);
-        expect(attackerContractBalance).to.be.lessThan(bankBalanceBefore);
+        expect(bankBalanceAfter).to.equal(bankBalanceBefore);
+        expect(attackerContractBalance).to.equal(0n);
+
     });
 });
