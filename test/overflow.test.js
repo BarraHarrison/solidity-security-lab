@@ -25,9 +25,9 @@ describe("Overflow & Underflow Lab", function () {
             vulnerable.transfer(owner.address, 2000)
         ).to.be.revertedWith("Not enough balance");
 
-        await vulnerable.connect(owner).mint(
-            ethers.BigInt(2n ** 256n - 500n)
-        );
+        const hugeValue = 2n ** 256n - 500n;
+
+        await vulnerable.connect(owner).mint(hugeValue);
 
         const bal = await vulnerable.balances(owner.address);
         expect(bal).to.be.lt(1000);
@@ -44,23 +44,23 @@ describe("Overflow & Underflow Lab", function () {
     });
 
     it("demonstrates mint overflow in VulnerableToken", async function () {
-        const { vulnerable } = await deployFixture();
+        const { vulnerable, owner } = await deployFixture();
 
-        await vulnerable.connect(owner).mint(
-            ethers.BigInt(2n ** 256n - 1n)
-        );
+        const maxBeforeOverflow = 2n ** 256n - 1n;
+
+        await vulnerable.connect(owner).mint(maxBeforeOverflow);
 
         const supply = await vulnerable.totalSupply();
         expect(supply).to.be.lt(1000);
     });
 
     it("prevents mint overflow in SafeToken", async function () {
-        const { safe } = await deployFixture();
+        const { safe, owner } = await deployFixture();
+
+        const overflowValue = 2n ** 256n - 1n;
 
         await expect(
-            safe.connect(owner).mint(
-                ethers.BigInt(2n ** 256n - 1n)
-            )
+            safe.connect(owner).mint(overflowValue)
         ).to.be.reverted;
     });
 });
