@@ -58,8 +58,9 @@ describe("Overflow & Underflow Lab", function () {
         const { safe } = await deployFixture();
 
         await expect(
-            safe.mint(ethers.BigNumber.from(2).pow(256).sub(1))
+            safe.connect(owner).mint(
+                ethers.BigInt(2n ** 256n - 1n)
+            )
         ).to.be.reverted;
     });
-
 });
