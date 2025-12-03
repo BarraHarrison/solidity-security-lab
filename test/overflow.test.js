@@ -25,8 +25,8 @@ describe("Overflow & Underflow Lab", function () {
             vulnerable.transfer(owner.address, 2000)
         ).to.be.revertedWith("Not enough balance");
 
-        await vulnerable.mint(
-            ethers.BigNumber.from("2").pow(256).sub(500)
+        await vulnerable.connect(owner).mint(
+            ethers.BigInt(2n ** 256n - 500n)
         );
 
         const bal = await vulnerable.balances(owner.address);
@@ -46,7 +46,9 @@ describe("Overflow & Underflow Lab", function () {
     it("demonstrates mint overflow in VulnerableToken", async function () {
         const { vulnerable } = await deployFixture();
 
-        await vulnerable.mint(ethers.BigNumber.from(2).pow(256).sub(1));
+        await vulnerable.connect(owner).mint(
+            ethers.BigInt(2n ** 256n - 1n)
+        );
 
         const supply = await vulnerable.totalSupply();
         expect(supply).to.be.lt(1000);
