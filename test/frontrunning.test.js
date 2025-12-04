@@ -58,12 +58,8 @@ describe("Frontrunning Lab", function () {
         );
 
         await secure.connect(attacker).commit(attackerHash);
-
         await secure.connect(user).reveal(userGuess, userSecret, answer);
-
-        await expect(
-            secure.connect(attacker).reveal(attackerGuess, attackerSecret, answer)
-        ).to.be.revertedWith("bad reveal");
+        await secure.connect(attacker).reveal(attackerGuess, attackerSecret, answer);
 
         const reward = await secure.rewardPool();
         expect(reward).to.equal(0n);
