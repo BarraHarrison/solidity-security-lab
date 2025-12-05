@@ -15,6 +15,9 @@ describe("Randomness Vulnerability Lab", function () {
 
         const result = await vulnerable.play(5);
 
-        expect(typeof result).to.equal("boolean");
+        expect(result).to.be.an("object");
+        expect(result.hash).to.be.a("string");
+        expect(result).to.have.property("from");
+
     });
 });
