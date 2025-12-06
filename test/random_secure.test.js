@@ -72,6 +72,8 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
             ) % 10n
         );
 
+        await ethers.provider.send("evm_mine", []);
+
         await safe.connect(user).reveal(secret);
 
         const realRandom = await safe.lastRandom();
