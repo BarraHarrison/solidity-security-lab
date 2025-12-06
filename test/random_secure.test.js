@@ -45,7 +45,7 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
 
         await expect(
             safe.connect(attacker).reveal(badSecret)
-        ).to.be.revertedWith("invalid reveal");
+        ).to.be.revertedWith("bad reveal");
     });
 
     it("prevents attacker from predicting randomness by inspecting block data", async function () {
@@ -61,18 +61,21 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
 
         const latestBlock = await ethers.provider.getBlock("latest");
 
-        const attackerWrongRandom = Number(
+        const attackerWrongGuess = Number(
             BigInt(
                 ethers.keccak256(
-                    ethers.solidityPacked(["uint256", "bytes32"], [secret, block.hash])
+                    ethers.solidityPacked(
+                        ["uint256", "bytes32"],
+                        [secret, latestBlock.hash]
+                    )
                 )
             ) % 10n
         );
 
         await safe.connect(user).reveal(secret);
 
-        const realBlockHashUsed = await safe.lastBlockHash();
         const realRandom = await safe.lastRandom();
+        const realBlockHashUsed = await safe.lastBlockHashUsed();
 
         expect(realBlockHashUsed).to.not.equal(latestBlock.hash);
     });
@@ -90,6 +93,6 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
 
         await expect(
             safe.connect(user).reveal(secret)
-        ).to.be.revertedWith("invalid reveal");
+        ).to.be.revertedWith("bad reveal");
     });
 });
