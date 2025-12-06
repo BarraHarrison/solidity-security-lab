@@ -51,7 +51,8 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
     it("prevents attacker from predicting randomness by inspecting block data", async function () {
         const { safe, user, attacker } = await deploySafe();
 
-        const secret = 11111;
+        const secret = 12345;
+
         const commitHash = ethers.keccak256(
             ethers.solidityPacked(["address", "uint256"], [user.address, secret])
         );
