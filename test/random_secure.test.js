@@ -71,9 +71,10 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
 
         await safe.connect(user).reveal(secret);
 
+        const realBlockHashUsed = await safe.lastBlockHash();
         const realRandom = await safe.lastRandom();
 
-        expect(attackerGuess).to.not.equal(realRandom);
+        expect(realBlockHashUsed).to.not.equal(latestBlock.hash);
     });
 
     it("prevents reusing the same commitment twice", async function () {
