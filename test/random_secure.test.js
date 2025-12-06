@@ -49,7 +49,7 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
     });
 
     it("prevents attacker from predicting randomness by inspecting block data", async function () {
-        const { safe, user, attacker } = await deploySafe();
+        const { safe, user } = await deploySafe();
 
         const secret = 12345;
 
@@ -59,9 +59,9 @@ describe("SafeRandom (Commit–Reveal RNG)", function () {
 
         await safe.connect(user).commit(commitHash);
 
-        const block = await ethers.provider.getBlock("latest");
+        const latestBlock = await ethers.provider.getBlock("latest");
 
-        const attackerGuess = Number(
+        const attackerWrongRandom = Number(
             BigInt(
                 ethers.keccak256(
                     ethers.solidityPacked(["uint256", "bytes32"], [secret, block.hash])
