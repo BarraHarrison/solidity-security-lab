@@ -55,6 +55,22 @@ describe("Oracle Manipulation Lab", function () {
             lendingVuln.target
         );
 
+        await ethers.provider.send("hardhat_setBalance", [
+            attackerContract.target,
+            "0x1000000000000000000",
+        ]);
+
+        await ethers.provider.send("hardhat_impersonateAccount", [
+            attackerContract.target,
+        ]);
+
+        const attackerContractSigner = await ethers.getSigner(attackerContract.target);
+
+        await tokenA
+            .connect(attackerContractSigner)
+            .approve(lendingVuln.target, ethers.MaxUint256);
+
+
         await tokenA.mint(attackerEOA.address, ethers.parseUnits("10", 18));
         await tokenB.mint(attackerEOA.address, ethers.parseUnits("2000", 18));
 
