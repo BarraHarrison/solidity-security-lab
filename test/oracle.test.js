@@ -6,20 +6,21 @@ describe("Oracle Manipulation Lab", function () {
 
     async function deployFixture() {
         const [deployer, attackerEOA, user] = await ethers.getSigners();
+        const depositor = user;
 
         const MockERC20 = await ethers.getContractFactory("MockERC20");
-        const tokenA = await MockERC20ERC20.deploy(
+        const tokenA = await MockERC20.deploy(
             "TokenA",
             "TKA",
             depositor.address,
-            ethers.parseUnits("100000")
+            ethers.parseUnits("100000", 18)
         );
 
-        const tokenB = await MockERC20ERC20.deploy(
+        const tokenB = await MockERC20.deploy(
             "TokenB",
             "TKB",
             depositor.address,
-            ethers.parseUnits("100000")
+            ethers.parseUnits("100000", 18)
         );
 
 
