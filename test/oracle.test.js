@@ -132,13 +132,11 @@ describe("Oracle Manipulation Lab", function () {
         );
 
         const attackerContractBal = await tokenB.balanceOf(attackerContract.target);
+
         expect(attackerContractBal).to.be.gt(0n);
 
-        expect(attackerContractBal).to.be.gt(startBal);
-
-        const protocolBalAfter = await tokenB.balanceOf(lendingVuln.target);
-        expect(protocolBalAfter).to.be.lt(ethers.parseUnits("5000", 18));
-
+        const attackerContractInitial = ethers.parseUnits("500", 18);
+        expect(attackerContractBal).to.be.gt(attackerContractInitial);
 
         const protocolBal = await tokenB.balanceOf(lendingVuln.target);
         expect(protocolBal).to.be.lt(ethers.parseUnits("5000", 18));
