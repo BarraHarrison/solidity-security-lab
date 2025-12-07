@@ -3,12 +3,12 @@ import hardhat from "hardhat";
 const { ethers } = hardhat;
 
 describe("Oracle Manipulation Lab", function () {
-
     async function deployFixture() {
         const [deployer, attackerEOA, user] = await ethers.getSigners();
         const depositor = user;
 
         const MockERC20 = await ethers.getContractFactory("MockERC20");
+
         const tokenA = await MockERC20.deploy(
             "TokenA",
             "TKA",
@@ -22,7 +22,6 @@ describe("Oracle Manipulation Lab", function () {
             depositor.address,
             ethers.parseUnits("100000", 18)
         );
-
 
         const MockPool = await ethers.getContractFactory("MockPool");
         const pool = await MockPool.deploy(tokenA.target, tokenB.target);
@@ -38,6 +37,7 @@ describe("Oracle Manipulation Lab", function () {
         );
 
         const LendingProtocol = await ethers.getContractFactory("LendingProtocol");
+
         const lendingVuln = await LendingProtocol.deploy(
             tokenA.target,
             tokenB.target,
@@ -58,14 +58,15 @@ describe("Oracle Manipulation Lab", function () {
         await tokenA.mint(attackerEOA.address, ethers.parseUnits("10", 18));
         await tokenB.mint(attackerEOA.address, ethers.parseUnits("2000", 18));
 
-        await tokenA.connect(attackerEOA).approve(attackerContract.target, ethers.MaxUint256);
-        await tokenB.connect(attackerEOA).approve(attackerContract.target, ethers.MaxUint256);
-
+        await tokenA
+            .connect(attackerEOA)
+            .approve(attackerContract.target, ethers.MaxUint256);
+        await tokenB
+            .connect(attackerEOA)
+            .approve(attackerContract.target, ethers.MaxUint256);
 
         const SafeOracle = await ethers.getContractFactory("SafeOracle");
-        const safeOracle = await SafeOracle.deploy(
-            ethers.parseUnits("1", 18)
-        );
+        const safeOracle = await SafeOracle.deploy(ethers.parseUnits("1", 18));
 
         const lendingSafe = await LendingProtocol.deploy(
             tokenA.target,
@@ -76,26 +77,32 @@ describe("Oracle Manipulation Lab", function () {
 
         await tokenB.mint(lendingSafe.target, ethers.parseUnits("5000", 18));
 
+        await tokenA
+            .connect(attackerEOA)
+            .approve(lendingSafe.target, ethers.MaxUint256);
+
         return {
             deployer,
             attackerEOA,
             user,
-            tokenA, tokenB,
+            depositor,
+            tokenA,
+            tokenB,
             pool,
             vulnerableOracle,
             lendingVuln,
+            attackerContract,
             safeOracle,
             lendingSafe,
-            attackerContract
         };
     }
 
     it("allows attacker to drain LendingProtocol using VulnerableOracle", async function () {
         const {
             attackerEOA,
-            tokenA, tokenB,
+            tokenB,
             lendingVuln,
-            attackerContract
+            attackerContract,
         } = await deployFixture();
 
         const startBal = await tokenB.balanceOf(attackerEOA.address);
@@ -108,37 +115,42 @@ describe("Oracle Manipulation Lab", function () {
             collateralA
         );
 
-        const afterBorrow = await tokenB.balanceOf(attackerContract.target);
+        const attackerContractBal = await tokenB.balanceOf(attackerContract.target);
+        expect(attackerContractBal).to.be.gt(ethers.parseUnits("2000", 18));
 
-        expect(afterBorrow).to.be.gt(ethers.parseUnits("2000", 18));
+        const protocolBal = await tokenB.balanceOf(lendingVuln.target);
+        expect(protocolBal).to.be.lt(ethers.parseUnits("5000", 18));
     });
 
     it("prevents oracle manipulation when using SafeOracle", async function () {
         const {
             attackerEOA,
-            tokenA, tokenB,
-            lendingSafe,
+            tokenA,
+            tokenB,
+            pool,
             safeOracle,
-            attackerContract,
-            pool
+            lendingSafe,
         } = await deployFixture();
 
         await safeOracle.setPrice(ethers.parseUnits("1", 18));
-
 
         const tokenBToPool = ethers.parseUnits("1500", 18);
         const collateralA = ethers.parseUnits("5", 18);
 
         await tokenB.connect(attackerEOA).transfer(pool.target, tokenBToPool);
 
-        await tokenA.connect(attackerEOA).transfer(attackerContract.target, collateralA);
+        await lendingSafe
+            .connect(attackerEOA)
+            .depositCollateral(collateralA);
 
-        const available = await lendingSafe.availableToBorrow(attackerContract.target);
+        const available = await lendingSafe.availableToBorrow(attackerEOA.address);
 
         expect(available).to.be.lt(ethers.parseUnits("20", 18));
 
         await expect(
-            lendingSafe.borrow(ethers.parseUnits("2000", 18))
+            lendingSafe
+                .connect(attackerEOA)
+                .borrow(ethers.parseUnits("2000", 18))
         ).to.be.revertedWith("exceeds borrow limit");
     });
 });
