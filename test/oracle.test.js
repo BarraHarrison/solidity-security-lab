@@ -140,6 +140,24 @@ describe("Oracle Manipulation Lab", function () {
 
         const protocolBal = await tokenB.balanceOf(lendingVuln.target);
         expect(protocolBal).to.be.lt(ethers.parseUnits("5000", 18));
+
+        console.log("\n--- Debug Info ---");
+
+        console.log("Pool tokenA:", (await tokenA.balanceOf(pool.target)).toString());
+        console.log("Pool tokenB:", (await tokenB.balanceOf(pool.target)).toString());
+
+        console.log("LendingProtocol tokenB balance:", (await tokenB.balanceOf(lendingVuln.target)).toString());
+        console.log("Attacker initial tokenB:", startBal.toString());
+
+        console.log("Oracle price:", (await vulnerableOracle.getPrice()).toString());
+
+        console.log("Available to borrow (before attack):",
+            (await lendingVuln.availableToBorrow(attackerContract.target)).toString()
+        );
+
+        const attackerAfter = await tokenB.balanceOf(attackerContract.target);
+        console.log("Attacker tokenB after attack:", attackerAfter.toString());
+        console.log("--- End Debug ---\n");
     });
 
     it("prevents oracle manipulation when using SafeOracle", async function () {
