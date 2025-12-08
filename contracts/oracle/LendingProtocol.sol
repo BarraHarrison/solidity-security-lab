@@ -15,8 +15,8 @@ interface IPriceOracle {
 }
 
 contract LendingProtocol {
-    IERC20 public immutable tokenA; // collateral token
-    IERC20 public immutable tokenB; // borrow token
+    IERC20 public immutable tokenA;
+    IERC20 public immutable tokenB;
     IPriceOracle public immutable oracle;
 
     // Collateral factor scaled by 1e18 (e.g. 0.5e18 = 50%)
