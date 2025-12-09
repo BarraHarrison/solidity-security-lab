@@ -115,10 +115,16 @@ describe("Oracle Manipulation Lab", function () {
 
     it("allows attacker to drain LendingProtocol using VulnerableOracle", async function () {
         const {
+            deployer,
             attackerEOA,
+            user,
+            depositor,
+            tokenA,
             tokenB,
+            pool,
+            vulnerableOracle,
             lendingVuln,
-            attackerContract,
+            attackerContract
         } = await deployFixture();
 
         const startBal = await tokenB.balanceOf(attackerEOA.address);
