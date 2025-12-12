@@ -25,10 +25,7 @@ describe("Flash Loan Attack Lab", function () {
 
         const FlashLoanProvider = await ethers.getContractFactory("FlashLoanProvider");
 
-        const flash = await FlashLoanProvider.deploy(
-            tokenA.target,
-            tokenB.target
-        );
+        const flash = await FlashLoanProvider.deploy(tokenA.target);
 
         await tokenA.mint(flash.target, ethers.parseUnits("50000", 18));
         await tokenB.mint(flash.target, ethers.parseUnits("50000", 18));
