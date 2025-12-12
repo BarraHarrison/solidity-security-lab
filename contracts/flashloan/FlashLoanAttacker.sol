@@ -40,7 +40,7 @@ contract FlashLoanAttacker {
     }
 
     function setDEXTarget(address _dex) external {
-        require(msg.sender == owner, "not owner")
+        require(msg.sender == owner, "not owner");
         dex = _dex;
     }
 
