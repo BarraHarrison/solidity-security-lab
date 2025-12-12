@@ -48,9 +48,9 @@ describe("Flash Loan Attack Lab", function () {
             .connect(attackerEOA)
             .deploy(
                 flash.target,
-                vulnDEX.target,
                 tokenA.target,
-                tokenB.target
+                tokenB.target,
+                vulnDEX.target
             );
 
         await tokenA.connect(attackerEOA).approve(attackerContract.target, ethers.MaxUint256);
