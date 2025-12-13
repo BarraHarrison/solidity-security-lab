@@ -26,9 +26,17 @@ contract FlashLoanProvider {
 
         require(token.transfer(borrower, amount), "flash transfer failed");
 
-        (bool ok, ) = borrower.call(
-        abi.encodeWithSignature("executeOnFlashLoan(uint256)", amount));
-        require(ok, "flash loan callback failed");
+        (bool ok, bytes memory ret) = borrower.call(
+        abi.encodeWithSignature("executeOnFlashLoan(uint256)", amount)
+        );
+
+        if (!ok) {
+        if (ret.length > 0) {
+        assembly {
+            revert(add(ret, 32), mload(ret))
+            }}
+        revert("flash loan callback failed");
+        }
 
 
         uint256 balanceAfter = token.balanceOf(address(this));
