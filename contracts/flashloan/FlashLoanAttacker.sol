@@ -15,7 +15,6 @@ interface IFlashLoanProvider {
 interface IVulnerableDEX {
     function swapAForB(uint256 amountIn) external returns (uint256);
     function swapBForA(uint256 amountIn) external returns (uint256);
-    require(tokenA.balanceOf(address(this)) >= amount, "still not enough A to repay");
 }
 
 
