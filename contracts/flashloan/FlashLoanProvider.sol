@@ -7,15 +7,6 @@ interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
 }
 
-/// @notice Interface that borrowers must implement to receive a flash loan
-interface IFlashLoanReceiver {
-    function executeOnFlashLoan(uint256 amount, bytes calldata data) external;
-}
-
-/**
- * @title FlashLoanProvider
- * @notice Very simple, intentionally under-secured single-asset flash loan provider.
- */
 contract FlashLoanProvider {
     IERC20 public immutable token;
 
@@ -26,9 +17,8 @@ contract FlashLoanProvider {
 
     function flashLoan(
         uint256 amount,
-        address borrower,
-        bytes calldata data
-    ) external {
+        address borrower
+        ) external {
         require(borrower != address(0), "zero borrower");
 
         uint256 balanceBefore = token.balanceOf(address(this));
@@ -36,7 +26,10 @@ contract FlashLoanProvider {
 
         require(token.transfer(borrower, amount), "flash transfer failed");
 
-        IFlashLoanReceiver(borrower).executeOnFlashLoan(amount, data);
+        (bool ok, ) = borrower.call(
+        abi.encodeWithSignature("executeOnFlashLoan(uint256)", amount));
+        require(ok, "flash loan callback failed");
+
 
         uint256 balanceAfter = token.balanceOf(address(this));
         require(
