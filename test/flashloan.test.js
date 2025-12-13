@@ -84,7 +84,7 @@ describe("Flash Loan Attack Lab", function () {
         console.log("\n--- Attack vs VulnerableDEX Debug ---");
         console.log("Attacker starts with tokenB:", attackerStartB.toString());
 
-        await attackerContract.connect(attackerEOA).executeFlashLoanAttack();
+        await attackerContract.connect(attackerEOA).startAttack(ethers.parseUnits("1000", 18));
 
         const attackerEndB = await tokenB.balanceOf(attackerEOA.address);
         const dexBalAfter = await tokenB.balanceOf(vulnDEX.target);
@@ -116,7 +116,7 @@ describe("Flash Loan Attack Lab", function () {
         console.log("Attacker starts with tokenB:", attackerStartB.toString());
 
         await expect(
-            attackerContract.connect(attackerEOA).executeFlashLoanAttack()
+            attackerContract.connect(attackerEOA).startAttack(ethers.parseUnits("1000", 18))
         ).to.be.reverted;
 
         const attackerEndB = await tokenB.balanceOf(attackerEOA.address);
