@@ -79,7 +79,7 @@ describe("Flash Loan Attack Lab", function () {
         console.log("Price A in B before:", priceBefore.toString());
         console.log("DEX tokenB before:", dexBBefore.toString());
 
-        await attackerContract.connect(attackerEOA).startAttack(ethers.parseUnits("1000", 18));
+        await attackerContract.connect(attackerEOA).startAttack(ethers.parseUnits("200", 18));
 
         const priceAfter = await vulnDEX.getPriceAinB();
         const dexBAfter = await tokenB.balanceOf(vulnDEX.target);
