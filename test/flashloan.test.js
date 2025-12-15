@@ -113,7 +113,7 @@ describe("Flash Loan Attack Lab", function () {
         console.log("Attacker starts with tokenB:", attackerStartB.toString());
 
         await expect(
-            attackerContract.connect(attackerEOA).startAttack(ethers.parseUnits("1000", 18))
+            attackerContract.connect(attackerEOA).startAttack(ethers.parseUnits("200", 18))
         ).to.be.reverted;
 
         const attackerEndB = await tokenB.balanceOf(attackerEOA.address);
@@ -122,5 +122,4 @@ describe("Flash Loan Attack Lab", function () {
 
         expect(attackerEndB).to.be.eq(attackerStartB);
     });
-
 });
